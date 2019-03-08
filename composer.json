@@ -8,8 +8,8 @@
     "linkorb/flex-auth": "master@dev"
   },
   "autoload": {
-    "psr-0": {
-      "FlexAuth": "src/"
+    "psr-4":{
+      "FlexAuth\\": "src/"
     }
   }
 }
