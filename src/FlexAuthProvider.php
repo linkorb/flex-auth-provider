@@ -1,6 +1,6 @@
 <?php
 
-namespace FlexAuth;
+namespace FlexAuthProvider;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Pimple\ServiceProviderInterface;
