@@ -12,7 +12,7 @@ use FlexAuth\Type\Memory\MemoryUserProviderFactory;
 use FlexAuth\Type\Entity\EntityUserProviderFactory;
 use FlexAuth\Type\UserbaseClient\UserbaseClientUserProviderFactory;
 use FlexAuth\Type\JWT\JWTUserProviderFactory;
-use FlexAuth\AuthFlexTypeProviderFactory;
+use FlexAuth\FlexAuthTypeProviderFactory;
 use FlexAuth\Type\JWT\JWTTokenAuthenticator;
 use FlexAuth\Type\JWT\FlexTypeJWTEncoder;
 use FlexAuth\Type\JWT\DefaultJWTUserFactory;
@@ -54,7 +54,7 @@ class FlexAuthProvider implements ServiceProviderInterface, EventListenerProvide
         /* Common services */
 
         $pimple['flex_auth.type_provider'] = function () {
-            return AuthFlexTypeProviderFactory::fromEnv('FLEX_AUTH');
+            return FlexAuthTypeProviderFactory::fromEnv('FLEX_AUTH');
         };
 
         $pimple['flex_auth.user_provider_factory'] = function ($app) {
