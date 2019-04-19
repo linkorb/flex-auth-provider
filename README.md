@@ -42,7 +42,8 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
     ],
 ]);
 $app['security.default_encoder'] = function ($app) {
-    return new \Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder();
+    return $pimple['flex_auth.security.password_encoder'];
+    // return new \Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder();
 };
 
 ```
