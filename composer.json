@@ -1,6 +1,6 @@
 {
   "name": "linkorb/flex-auth-provider",
-  "description": "Silex service provider for including AuthFlex library.",
+  "description": "Silex service provider for including FlexAuth library.",
   "keywords": ["auth", "silex"],
   "license": "MIT",
   "type": "silex-provider",
