@@ -2,6 +2,7 @@
 
 namespace FlexAuthProvider;
 
+use FlexAuth\FlexAuthTypeProviderFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Pimple\ServiceProviderInterface;
 use Silex\Api\EventListenerProviderInterface;
@@ -54,7 +55,7 @@ class FlexAuthProvider implements ServiceProviderInterface, EventListenerProvide
         /* Common services */
 
         $pimple['flex_auth.type_provider'] = function () {
-            return AuthFlexTypeProviderFactory::fromEnv('FLEX_AUTH');
+            return FlexAuthTypeProviderFactory::fromEnv('FLEX_AUTH');
         };
 
         $pimple['flex_auth.user_provider_factory'] = function ($app) {
