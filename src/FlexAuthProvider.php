@@ -2,6 +2,7 @@
 
 namespace FlexAuthProvider;
 
+use FlexAuth\Security\FlexAuthPasswordEncoder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Pimple\ServiceProviderInterface;
 use Silex\Api\EventListenerProviderInterface;
@@ -12,7 +13,7 @@ use FlexAuth\Type\Memory\MemoryUserProviderFactory;
 use FlexAuth\Type\Entity\EntityUserProviderFactory;
 use FlexAuth\Type\UserbaseClient\UserbaseClientUserProviderFactory;
 use FlexAuth\Type\JWT\JWTUserProviderFactory;
-use FlexAuth\AuthFlexTypeProviderFactory;
+use FlexAuth\FlexAuthTypeProviderFactory;
 use FlexAuth\Type\JWT\JWTTokenAuthenticator;
 use FlexAuth\Type\JWT\FlexTypeJWTEncoder;
 use FlexAuth\Type\JWT\DefaultJWTUserFactory;
@@ -54,7 +55,7 @@ class FlexAuthProvider implements ServiceProviderInterface, EventListenerProvide
         /* Common services */
 
         $pimple['flex_auth.type_provider'] = function () {
-            return AuthFlexTypeProviderFactory::fromEnv('FLEX_AUTH');
+            return FlexAuthTypeProviderFactory::fromEnv('FLEX_AUTH');
         };
 
         $pimple['flex_auth.user_provider_factory'] = function ($app) {
@@ -75,6 +76,11 @@ class FlexAuthProvider implements ServiceProviderInterface, EventListenerProvide
         $pimple['flex_auth.security.user_provider'] = function ($app) {
             return new \FlexAuth\Security\FlexUserProvider($app['flex_auth.user_provider_factory']);
         };
+
+        $pimple['flex_auth.security.password_encoder'] = function ($app) {
+            return new FlexAuthPasswordEncoder($app['flex_auth.type_provider']);
+        };
+
 
         $pimple['flex_auth.type.jwt.user_factory'] = function ($app) {
             return new DefaultJWTUserFactory();

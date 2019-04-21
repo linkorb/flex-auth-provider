@@ -1,9 +1,9 @@
 {
   "name": "linkorb/flex-auth-provider",
-  "description": "Silex service provider for including AuthFlex library.",
+  "description": "Silex service provider for including FlexAuth library.",
   "keywords": ["auth", "silex"],
   "license": "MIT",
-  "type": "project",
+  "type": "silex-provider",
   "autoload": {
     "psr-4":{
       "FlexAuthProvider\\": "src/"
@@ -12,6 +12,6 @@
   "require": {
     "php": "^7.0",
     "silex/silex": "~2.0",
-    "linkorb/flex-auth": "^1.0.1"
+    "linkorb/flex-auth": "^1.3.0"
   }
 }
