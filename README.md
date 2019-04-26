@@ -18,6 +18,8 @@ $app['security.user_provider.main'] = function ($app) {
     return $app['flex_auth.security.user_provider'];
 };
 
+$app['flex_auth.type.jwt.login_page_url'] = '/sign-in'
+
 $app->register(new Silex\Provider\SecurityServiceProvider(), [
     'security.firewalls' => [
         'main' => [

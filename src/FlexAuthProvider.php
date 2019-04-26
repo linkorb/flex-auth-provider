@@ -24,6 +24,19 @@ use FlexAuth\Type\JWT\DefaultJWTUserFactory;
  */
 class FlexAuthProvider implements ServiceProviderInterface, EventListenerProviderInterface, ControllerProviderInterface, BootableProviderInterface
 {
+    public const SERVICE_PREFIX_TYPE = 'flex_auth.type';
+
+    public const SERVICE_PROVIDER = 'flex_auth.type_provider';
+    public const SERVICE_USER_PROVIDER_FACTORY = 'flex_auth.user_provider_factory';
+    public const SERVICE_SECURITY_USER_PROVIDER = 'flex_auth.security.user_provider';
+    public const SERVICE_SECURITY_PASSWORD_ENCODER = 'flex_auth.security.password_encoder';
+    public const SERVICE_SECURITY_JWT_AUTHENTICATOR = 'flex_auth.type.jwt.security.authenticator';
+    public const SERVICE_JWT_ENCODER = 'flex_auth.type.jwt.jwt_encoder';
+    public const SERVICE_JWT_USER_FACTORY = 'flex_auth.type.jwt.user_factory';
+
+    public const DEFAULT_ENV_VAR = 'FLEX_AUTH';
+    public const PARAM_JWT_LOGIN_PAGE_URL = 'flex_auth.type.jwt.login_page_url';
+
     public function boot(\Silex\Application $app)
     {
     }
@@ -32,68 +45,70 @@ class FlexAuthProvider implements ServiceProviderInterface, EventListenerProvide
     {
         /* Flex auth type registration */
 
-        $pimple['flex_auth.type.'. MemoryUserProviderFactory::TYPE] = function () {
+        $pimple[self::SERVICE_PREFIX_TYPE . '.' . MemoryUserProviderFactory::TYPE] = function () {
             return new MemoryUserProviderFactory();
         };
 
         if (isset($pimple['entity_manager'])) {
-            $pimple['flex_auth.type.'. EntityUserProviderFactory::TYPE] = function ($app) {
+            $pimple[self::SERVICE_PREFIX_TYPE . '.' . EntityUserProviderFactory::TYPE] = function ($app) {
                 return new EntityUserProviderFactory($app['entity_manager']);
             };
         }
 
         if (class_exists(\UserBase\Client\UserProvider::class)) {
-            $pimple['flex_auth.type.'. \FlexAuth\Type\UserbaseClient\UserbaseClientUserProviderFactory::TYPE] = function () {
+            $pimple[self::SERVICE_PREFIX_TYPE . '.' . \FlexAuth\Type\UserbaseClient\UserbaseClientUserProviderFactory::TYPE] = function () {
                 return new UserbaseClientUserProviderFactory();
             };
         }
 
-        $pimple['flex_auth.type.'. JWTUserProviderFactory::TYPE] = function () {
+        $pimple[self::SERVICE_PREFIX_TYPE . '.' . JWTUserProviderFactory::TYPE] = function () {
             return new JWTUserProviderFactory();
         };
 
         /* Common services */
 
-        $pimple['flex_auth.type_provider'] = function () {
-            return FlexAuthTypeProviderFactory::fromEnv('FLEX_AUTH');
+        $pimple[self::SERVICE_PROVIDER] = function () {
+            return FlexAuthTypeProviderFactory::fromEnv(self::DEFAULT_ENV_VAR);
         };
 
-        $pimple['flex_auth.user_provider_factory'] = function ($app) {
-            $flexAuthUserProviderFactory = new \FlexAuth\UserProviderFactory($app['flex_auth.type_provider']);
+        $pimple[self::SERVICE_USER_PROVIDER_FACTORY] = function ($app) {
+            $flexAuthUserProviderFactory = new \FlexAuth\UserProviderFactory($app[self::SERVICE_PROVIDER]);
 
-            $flexAuthUserProviderFactory->addType(MemoryUserProviderFactory::TYPE, $app['flex_auth.type.'. MemoryUserProviderFactory::TYPE]);
-            if (isset($app['flex_auth.type.'. EntityUserProviderFactory::TYPE])) {
-                $flexAuthUserProviderFactory->addType(EntityUserProviderFactory::TYPE, $app['flex_auth.type.'. EntityUserProviderFactory::TYPE]);
+            $flexAuthUserProviderFactory->addType(MemoryUserProviderFactory::TYPE, $app[self::SERVICE_PREFIX_TYPE . '.' . MemoryUserProviderFactory::TYPE]);
+            if (isset($app[self::SERVICE_PREFIX_TYPE . '.' . EntityUserProviderFactory::TYPE])) {
+                $flexAuthUserProviderFactory->addType(EntityUserProviderFactory::TYPE, $app[self::SERVICE_PREFIX_TYPE . '.' . EntityUserProviderFactory::TYPE]);
             }
-            if (isset($app['flex_auth.type.'. \FlexAuth\Type\UserbaseClient\UserbaseClientUserProviderFactory::TYPE])) {
-                $flexAuthUserProviderFactory->addType(UserbaseClientUserProviderFactory::TYPE, $app['flex_auth.type.'. UserbaseClientUserProviderFactory::TYPE]);
+            if (isset($app[self::SERVICE_PREFIX_TYPE . '.' . \FlexAuth\Type\UserbaseClient\UserbaseClientUserProviderFactory::TYPE])) {
+                $flexAuthUserProviderFactory->addType(UserbaseClientUserProviderFactory::TYPE, $app[self::SERVICE_PREFIX_TYPE . '.' . UserbaseClientUserProviderFactory::TYPE]);
             }
-            $flexAuthUserProviderFactory->addType(JWTUserProviderFactory::TYPE, $app['flex_auth.type.'. JWTUserProviderFactory::TYPE]);
+            $flexAuthUserProviderFactory->addType(JWTUserProviderFactory::TYPE, $app[self::SERVICE_PREFIX_TYPE . '.' . JWTUserProviderFactory::TYPE]);
 
             return $flexAuthUserProviderFactory;
         };
 
-        $pimple['flex_auth.security.user_provider'] = function ($app) {
-            return new \FlexAuth\Security\FlexUserProvider($app['flex_auth.user_provider_factory']);
+        $pimple[self::SERVICE_SECURITY_USER_PROVIDER] = function ($app) {
+            return new \FlexAuth\Security\FlexUserProvider($app[self::SERVICE_USER_PROVIDER_FACTORY]);
         };
 
-        $pimple['flex_auth.security.password_encoder'] = function ($app) {
-            return new FlexAuthPasswordEncoder($app['flex_auth.type_provider']);
+        $pimple[self::SERVICE_SECURITY_PASSWORD_ENCODER] = function ($app) {
+            return new FlexAuthPasswordEncoder($app[self::SERVICE_PROVIDER]);
         };
 
-
-        $pimple['flex_auth.type.jwt.user_factory'] = function ($app) {
+        $pimple[self::SERVICE_JWT_USER_FACTORY] = function ($app) {
             return new DefaultJWTUserFactory();
         };
 
-        $pimple['flex_auth.type.jwt.jwt_encoder'] = function ($app) {
-            return new FlexTypeJWTEncoder($app['flex_auth.type_provider']);
+        $pimple[self::SERVICE_JWT_ENCODER] = function ($app) {
+            return new FlexTypeJWTEncoder($app[self::SERVICE_PROVIDER]);
         };
-        $pimple['flex_auth.type.jwt.security.authenticator'] = function ($app) {
+
+        $pimple[self::PARAM_JWT_LOGIN_PAGE_URL] = '/login';
+        $pimple[self::SERVICE_SECURITY_JWT_AUTHENTICATOR] = function ($app) {
             return new JWTTokenAuthenticator(
-                $app['flex_auth.type.jwt.user_factory'],
-                $app['flex_auth.type.jwt.jwt_encoder'],
-                $app['flex_auth.type_provider']
+                $app[self::SERVICE_JWT_USER_FACTORY],
+                $app[self::SERVICE_JWT_ENCODER],
+                $app[self::SERVICE_PROVIDER],
+                $app[self::PARAM_JWT_LOGIN_PAGE_URL]
             );
         };
     }
