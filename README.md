@@ -14,7 +14,7 @@ $app = new Application();
 $app->register(new \Silex\Provider\SessionServiceProvider());
 $app->register(new \FlexAuthProvider\FlexAuthProvider());
 
-// define login page for redirect if jwt authentication was needed for browser request 
+// define login page for redirect if jwt authentication is failed via browser 
 $app['flex_auth.jwt.redirect_login_page'] = "/login";
 
 $app['security.user_provider.main'] = function ($app) {
