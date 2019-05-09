@@ -93,7 +93,8 @@ class FlexAuthProvider implements ServiceProviderInterface, EventListenerProvide
             return new JWTTokenAuthenticator(
                 $app['flex_auth.type.jwt.user_factory'],
                 $app['flex_auth.type.jwt.jwt_encoder'],
-                $app['flex_auth.type_provider']
+                $app['flex_auth.type_provider'],
+                $app['flex_auth.jwt.redirect_login_page'] ?? null
             );
         };
     }
