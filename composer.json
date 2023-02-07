@@ -12,6 +12,6 @@
   "require": {
     "php": ">=7.0",
     "silex/silex": "~2.0",
-    "linkorb/flex-auth": "^1.3.0"
+    "linkorb/flex-auth": "^1.0"
   }
 }
