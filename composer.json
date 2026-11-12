@@ -13,5 +13,8 @@
     "php": ">=7.0",
     "silex/silex": "~2.0",
     "linkorb/flex-auth": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6"
   }
 }
